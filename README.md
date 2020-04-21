@@ -22,5 +22,5 @@ The current hash is of the format `"#0=" + LZString.compressToEncodedURIComponen
 	- `link.name` - The name of the link to display.
 	- `link.url` - The resolved URL of the link in question.
 	- `link.type` - The type of link, either `'style'` for stylesheets, `'script'` for scripts, or `'document'` for the main document.
-	- `link.patches` - An optional list of patch objects for relevant dependencies.
-	- `link.selections` - An optional comma-separated list of selections. Follows the same format as `file.selections`.
+	- `link.patches` - An optional array of patches to apply to the resulting source of that link.
+	- `link.selections` - An optional comma-separated list of selections within that link. Follows the same format as `file.selections`.
