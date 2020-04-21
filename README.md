@@ -9,7 +9,8 @@ Flems.io is based on the Open Source [Flems module](https://github.com/porsager/
 
 ## The Flems.io url hash
 
-- The hash is of the format `#0=STR` where `STR` is the result of `LZString.compressToEncodedURIComponent(JSON.stringify(state))` and `state` is as documented below.
+The current hash is of the format `"#0=" + LZString.compressToEncodedURIComponent(JSON.stringify(state))` where `LZString.compressToEncodedURIComponent` is from [`lz-string`](https://github.com/pieroxy/lz-string) and `state` is an object as per below:
+
 - `state.files` - The array of user files, where each file an object `file` with the following properties:
 	- `file.name` - The name of the file
 	- `file.contents` - The contents of the file
@@ -20,6 +21,6 @@ Flems.io is based on the Open Source [Flems module](https://github.com/porsager/
 - `state.links` - The array of external links, where each file an object `file` with the following properties:
 	- `link.name` - The name of the link to display.
 	- `link.url` - The resolved URL of the link in question.
-	- `link.type` - The type of link. I know about `"script"`, but I know others exist.
-	- `link.patches` - An optional list of patch arrays from a utility I can't remember off the top of my head.
-	- `link.selections` - An optional comma-separated list of selections. Works the same way as `file.selections`.
+	- `link.type` - The type of link, either `'style'` for stylesheets, `'script'` for scripts, or `'document'` for the main document.
+	- `link.patches` - An optional list of patch objects for relevant dependencies.
+	- `link.selections` - An optional comma-separated list of selections. Follows the same format as `file.selections`.
