@@ -1,4 +1,5 @@
 # [Flems.io](https://flems.io)
+
 Flems is a playground for web development. It's ideal for prototyping ideas & sharing working front-end code examples.
 
 Unlike other playgrounds, Flems doesn't require a connection to the server after page load: all the code you write in a Flems is computed in the browser and saved as a compressed string in the URL. The only thing you need a connection for is downloading extra dependencies. This means you can type away without needing to 'save' a Flems and the URL in the location bar will always be a shareable link to exactly what you're seeing.
@@ -7,20 +8,56 @@ Every Flems starts with an HTML, JS and CSS file, but you can add more files - F
 
 Flems.io is based on the Open Source [Flems module](https://github.com/porsager/flems) which you can use for easy self hosting or embedding.
 
-## The Flems.io url hash
+## The Flems.io URL hash
 
-The current hash is of the format `"#0=" + LZString.compressToEncodedURIComponent(JSON.stringify(state))` where `LZString.compressToEncodedURIComponent` is from [`lz-string`](https://github.com/pieroxy/lz-string) and `state` is an object as per below:
+Flems.io stores the state of the application in a URL hash. The current hash is of the format:
 
-- `state.files` - The array of user files, where each file an object `file` with the following properties:
-	- `file.name` - The name of the file
-	- `file.contents` - The contents of the file
-	- `file.selections` - An optional comma-separated list of the following:
-		- `L:C` - A single cursor
-		- `L:C-L:C` - A full selection, where the first is the start and the second is the end of the selection.
-		- Lines and columns are both 0-indexed.
-- `state.links` - The array of external links, where each file an object `file` with the following properties:
-	- `link.name` - The name of the link to display.
-	- `link.url` - The resolved URL of the link in question.
-	- `link.type` - The type of link, either `'style'` for stylesheets, `'script'` for scripts, or `'document'` for the main document.
-	- `link.patches` - An optional array of patches to apply to the resulting source of that link.
-	- `link.selections` - An optional comma-separated list of selections within that link. Follows the same format as `file.selections`.
+```js
+`#0=${LZString.compressToEncodedURIComponent(JSON.stringify(state))}`;
+```
+
+where `LZString.compressToEncodedURIComponent` is from [`lz-string`](https://github.com/pieroxy/lz-string) and `state` is an object as per below:
+
+### state.files
+
+The array of user files. Each file is an object with the following properties:
+
+| property   | type   | required | default              | description                                                                                                                   |
+| ---------- | ------ | -------- | -------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| name       | string | yes      | N/A                  | The name of the file                                                                                                          |
+| content    | string | no       | `''`                 | The contents of the file                                                                                                      |
+| type       | string | no       | Inferred from `name` | One of `'document'` (main HTML), `'script'` (JS and friends), or `'style'` (CSS and friends)                                  |
+| compiler   | string | no       | N/A                  | Compiler to use for the file, one of `styl`, `sass`, `less`, `ts`, `babel`, `ls`, `coffee`, or `sibilant`                     |
+| selections | string | no       | N/A                  | Comma-separated list of cursor (`L:C`) and selection (`L:C-L:C`) locations, where lines (`L`) and columns (`C`) are 0-indexed |
+
+The format of `state.files` matches the [same option in the Flems module](https://github.com/porsager/flems#contents). If unspecified, the default value of `state.files` is:
+
+```js
+[
+  { name: ".html", content: "" },
+  { name: ".js", content: "" },
+  { name: ".css", content: "" },
+];
+```
+
+### state.links
+
+The array of external links. Each link is an object with the following properties:
+
+| property   | type     | required | default             | description                                                                                                                   |
+| ---------- | -------- | -------- | ------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| url        | string   | yes      | N/A                 | URL of the linked file                                                                                                        |
+| name       | string   | no       | Inferred from `url` | The name of the linked file                                                                                                   |
+| type       | string   | no       | Inferred from `url` | One of `'document'` (main HTML), `'script'` (JS and friends), `'style'` (CSS and friends), or a supported file extension      |
+| patches    | string[] | no       | N/A                 | An array of patches to apply to the resulting source of the link                                                              |
+| selections | string   | no       | N/A                 | Comma-separated list of cursor (`L:C`) and selection (`L:C-L:C`) locations, where lines (`L`) and columns (`C`) are 0-indexed |
+
+The format of `state.links` matches the same option [in the Flems module](https://github.com/porsager/flems#links). If unspecified, the default value of `state.links` is `[]`.
+
+### Other options
+
+The `state` object may also contain any of the [options available to the Flems module](https://github.com/porsager/flems#options). In addition, the following options are valid on Flems.io:
+
+| property         | type    | required | default | description                                                                                        |
+| ---------------- | ------- | -------- | ------- | -------------------------------------------------------------------------------------------------- |
+| fullscreenButton | boolean | no       | `true`  | Show or hide the fullscreen button (Note: fullscreen functionality is currently disabled; see #25) |
